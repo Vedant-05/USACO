@@ -1,76 +1,62 @@
+// upper N / 2 cards are for the first half, lower N / 2 cards are for the second half.
+// For first half, pick the card that is the least greater than Elsie's card
+// For second half, pick the card that is the least smaller than Elsie's card
+
 #include <bits/stdc++.h>
+
 using namespace std;
 
-int number_of_wins(vector<int> &bessie, vector<int> &elsie,
-                   function<bool(int, int)> cmp) {
-	int n = size(bessie);
-	assert(size(bessie) == size(elsie));
-
-	sort(begin(bessie), end(bessie), cmp);
-	sort(begin(elsie), end(elsie), cmp);
-
-	int bpos = 0;  // keep track of index of card which bessie uses in current move
-	int wins = 0;
-
-	for (int i = 0; i < n; i++) {
-		// Check if Bessie can win. If she can't, she'll just use her worst
-		// card.
-		if (cmp(bessie[bpos], elsie[i])) {
-			wins++;
-			bpos++;
-		}
-	}
-
-	return wins;
-}
-
 int main() {
-	freopen("cardgame.in", "r", stdin);
-	freopen("cardgame.out", "w", stdout);
-
-	int n;
-	cin >> n;
-
-	map<int, int> elsie_has;
-
-	// First and second half are independent of each other.
-	vector<int> bessie_first(n / 2), bessie_second(n / 2);
-	vector<int> elsie_first(n / 2), elsie_second(n / 2);
-
-	for (int i = 0; i < n; i++) {
-		int x;
-		cin >> x;
-
-		elsie_has[x] = 1;
-
-		if (i < n / 2) {
-			elsie_first[i] = x;
-		} else {
-			elsie_second[i - n / 2] = x;
-		}
-	}
-
-	for (int i = 2 * n; i > 0; i--) {
-		if (elsie_has.find(i) == elsie_has.end())  // elsie does not have this card
-		{
-			if (size(bessie_first) < n / 2)  // bigger card must be used in first half
-			{
-				bessie_first.push_back(i);
-			} else {
-				bessie_second.push_back(i);
-			}
-		}
-	}
-
-	int ans = 0;
-
-	// First half person with card of larger value wins
-	ans +=
-	    number_of_wins(bessie_first, elsie_first, [](int a, int b) { return a > b; });
-
-	// In second half of game person with card of smaller value win
-	ans +=
-	    number_of_wins(bessie_second, elsie_second, [](int a, int b) { return a < b; });
-
-	cout << ans << endl;
+    ios_base::sync_with_stdio(0); cin.tie(0);
+    
+    freopen("cardgame.in", "r", stdin);
+    freopen("cardgame.out", "w", stdout);
+    
+    int N; cin >> N;
+    
+    set<int> bessie_cards;
+    int elsie_cards[N];
+    
+    for (int i = 1; i <= 2 * N; ++i) bessie_cards.insert(i);
+    
+    for (int i = 0; i < N; ++i) {
+        cin >> elsie_cards[i];
+        bessie_cards.erase(elsie_cards[i]);
+    }
+    
+    set<int> lower_half;
+    set<int> upper_half;
+    
+    int i = 0;
+    for (int card : bessie_cards) {
+        if (i < N / 2) lower_half.insert(card);
+        else if (i < N) upper_half.insert(card);
+        else break;
+        i++;
+    }
+    
+    int ans = 0;
+    for (int i = 0; i < N / 2; ++i) {
+        auto it = upper_half.upper_bound(elsie_cards[i]);
+        if (it != upper_half.end()) {
+            ans++;
+            upper_half.erase(it);
+        }
+        else {
+            upper_half.erase(upper_half.begin());
+        }
+    }
+    for (int i = N / 2; i < N; ++i) {
+        auto it = lower_half.upper_bound(elsie_cards[i]);
+        if (it != lower_half.begin()) {
+            it--;
+            ans++;
+            lower_half.erase(it);
+        }
+        else {
+            lower_half.erase(prev(lower_half.end()));
+        }
+    }
+    
+    cout << ans << "\n";
 }
