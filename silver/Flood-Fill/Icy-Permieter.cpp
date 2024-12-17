@@ -5,7 +5,7 @@ using ll = long long;
 using db = long double;
 using str = string;
 
-using pi = pair< int, int >;
+  using pi = pair< int, int >;
 #define mp make_pair
 #define f first
 #define s second
