@@ -10,7 +10,7 @@ struct Cow {
 vector<Cow> cows;
 vector<int> curr_net;
 
-void dfs(int curr) {
+   void dfs(int curr) {
 	cows[curr].visited = true;
 	curr_net.push_back(curr);
 	for (int i : cows[curr].adj) {
